@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.build.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		// "baseUrl": "./src/",
+		"paths": {
+			"*": ["./*"]
+		},
+		"typeRoots": ["./Dotperm.ts"]
+	},
+	"include": ["./Dotperm.ts"]
+}

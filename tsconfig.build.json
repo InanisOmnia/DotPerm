@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  // Mapped from https://www.typescriptlang.org/tsconfig
+  "compilerOptions": {
+    // Type Checking
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": true, // ! false
+    "noUnusedLocals": false, // ! true
+    "noUnusedParameters": false, // ! true
+
+    "exactOptionalPropertyTypes": false, // ! true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": false, // ! true
+    "noImplicitAny": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false, // ! true
+    "strictPropertyInitialization": false, // ! true
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": false, // ! true
+
+    // Modules
+    "allowArbitraryExtensions": false,
+    "allowImportingTsExtensions": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "importHelpers": false,
+    "newLine": "lf",
+    "noEmitHelpers": false,
+    "outDir": "dist",
+    "removeComments": false,
+    "sourceMap": true,
+    "preserveConstEnums": true,
+
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    // Language and Environment
+    "experimentalDecorators": true,
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "typeRoots": ["node_modules/@types", "./Dotperm.ts"]
+  },
+  "exclude": ["*.test.ts", "node_modules", "dist"]
+}

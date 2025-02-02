@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.build.json",
+	"compilerOptions": {
+		"noImplicitReturns": false,
+
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"declaration": false,
+		"declarationMap": false,
+		"declarationDir": null,
+		"typeRoots": ["./Dotperm.ts"]
+	},
+	"include": ["./Dotperm.ts"]
+}

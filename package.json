@@ -1,0 +1,19 @@
+{
+  "name": "dotperm",
+  "version": "1.0.0",
+  "description": "Permission System like Minecraft",
+  "main": "./dist/Dotperm.js",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "dev": "concurrently --kill-others \"tsc --watch -p ./tsconfig.json\" \"tsc-alias -w\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "tsc-alias": "^1.8.7",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
