@@ -8,7 +8,7 @@
 		"declaration": false,
 		"declarationMap": false,
 		"declarationDir": null,
-		"typeRoots": ["./Dotperm.ts"]
+		"typeRoots": ["./src"]
 	},
-	"include": ["./Dotperm.ts"]
+	"include": ["./src"]
 }

@@ -6,7 +6,7 @@
 		"paths": {
 			"*": ["./*"]
 		},
-		"typeRoots": ["./Dotperm.ts"]
+		"typeRoots": ["./src"]
 	},
-	"include": ["./Dotperm.ts"]
+	"include": ["./src"]
 }
