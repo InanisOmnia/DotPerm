@@ -2,7 +2,7 @@
   "name": "dotperm",
   "version": "1.0.0",
   "description": "Permission System like Minecraft",
-  "main": "./Dotperm.ts",
+  "main": "./dist/index.ts",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "dev": "concurrently --kill-others \"tsc --watch -p ./tsconfig.json\" \"tsc-alias -w\""
