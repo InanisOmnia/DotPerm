@@ -20,9 +20,7 @@ export class Perm {
 		this.isPositive = isPositive;
 	}
 
-	covers(permission: Perm): [false, CoverType] | [true];
-	covers(permission: string): [false, CoverType] | [true];
-	covers(permission: unknown): [false, CoverType] | [true] {
+	covers(permission: Perm | string): [false, CoverType] | [true] {
 		const permToTest = typeof permission == "string" ? Perm.deserialise(permission) : (permission as Perm);
 		if (!permToTest.isPositive) throw Error("Cannot perform cover check on a revoked permission");
 
@@ -35,9 +33,7 @@ export class Perm {
 		return [true];
 	}
 
-	exactMatch(permission: Perm): boolean;
-	exactMatch(permission: string): boolean;
-	exactMatch(permission: unknown): boolean {
+	exactMatch(permission: Perm | string): boolean {
 		const permToTest = typeof permission == "string" ? Perm.deserialise(permission) : (permission as Perm);
 
 		if (this.permPath.length != permToTest.permPath.length) return false; // if perm lengths aren't the same then they definitely don't match exactly
@@ -49,18 +45,16 @@ export class Perm {
 		return this.isPositive == permToTest.isPositive;
 	}
 
-	isChildOf(permission: Perm): boolean;
-	isChildOf(permission: string): boolean;
-	isChildOf(permission: unknown): boolean {
+	isChildOf(permission: Perm | string): boolean {
 		const permToTest = typeof permission == "string" ? Perm.deserialise(permission) : (permission as Perm);
 
-        if (permToTest.permPath.length > this.permPath.length) return false; // if permToTest is longer then it can never be a parent of this perm
-        
+		if (permToTest.permPath.length > this.permPath.length) return false; // if permToTest is longer then it can never be a parent of this perm
+
 		for (let i = 0; i < permToTest.permPath.length; i++) {
 			if (this.permPath[i] != permToTest.permPath[i]) return false;
 		}
 
-        return true;
+		return true;
 	}
 
 	static serialise(perm: Perm): string {
@@ -96,9 +90,7 @@ export class PermsList {
 		this.perms = perms || [];
 	}
 
-	has(perm: string): boolean;
-	has(perm: Perm): boolean;
-	has(perm: unknown): boolean {
+	has(perm: Perm | string): boolean {
 		const deserialisedPerm = typeof perm == "string" ? Perm.deserialise(perm) : (perm as Perm);
 		let wasCoveredAtLeastOnce = false;
 		for (const p of this.perms) {
@@ -115,9 +107,7 @@ export class PermsList {
 		return false;
 	}
 
-	exactMatch(permission: Perm): boolean;
-	exactMatch(permission: string): boolean;
-	exactMatch(permission: unknown): boolean {
+	exactMatch(permission: Perm | string): boolean {
 		const permToTest = typeof permission == "string" ? Perm.deserialise(permission) : (permission as Perm);
 
 		for (const p of this.perms) {
@@ -126,22 +116,15 @@ export class PermsList {
 		return false;
 	}
 
-	grant(permission: string): void;
-	grant(permission: string[]): void;
-	grant(...permission: string[]): void;
-	grant(permission: Perm): void;
-	grant(...permission: Perm[]): void;
-	grant(permission: Perm[]): void;
-	grant(permission: PermsList): void;
-	grant(permission: unknown): void {
+	grant(permission: string | string[] | Perm | Perm[] | PermsList): void {
 		let permsToAdd: Perm[];
 
 		if (permission instanceof PermsList) permsToAdd = permission.perms;
-		else if (Array.isArray(permission) && permission[0] instanceof Perm) permsToAdd = permission;
-		else if (Array.isArray(permission) && typeof permission[0] == "string")
-			permsToAdd = permission.map((p) => Perm.deserialise(p));
 		else if (typeof permission == "string") permsToAdd = [Perm.deserialise(permission)];
 		else if (permission instanceof Perm) permsToAdd = [permission];
+		else if (Array.isArray(permission) && permission.every((p) => typeof p == "string"))
+			permsToAdd = permission.map((p) => Perm.deserialise(p));
+		else permsToAdd = permission;
 
 		for (const permToAdd of permsToAdd) {
 			if (!permToAdd.isPositive) throw new Error("Cannot grant a negative permission");
@@ -152,32 +135,24 @@ export class PermsList {
 
 			if (this.has(permToAdd)) continue;
 
-            for (const myPerm of this.perms) {
-
-                // granting a more generic permission removes more precise perms from the list
-                if (myPerm.isChildOf(permToAdd)) this._remove(myPerm);
+			for (const myPerm of this.perms) {
+				// granting a more generic permission removes more precise perms from the list
+				if (myPerm.isChildOf(permToAdd)) this._remove(myPerm);
 			}
 
 			this._add(permToAdd);
 		}
 	}
 
-	revoke(permission: string): void;
-	revoke(permission: string[]): void;
-	revoke(...permission: string[]): void;
-	revoke(permission: Perm): void;
-	revoke(...permission: Perm[]): void;
-	revoke(permission: Perm[]): void;
-	revoke(permission: PermsList): void;
-	revoke(permission: unknown): void {
+	revoke(permission: string | string[] | Perm | Perm[] | PermsList): void {
 		let permsToRevoke: Perm[];
 
 		if (permission instanceof PermsList) permsToRevoke = permission.perms;
-		else if (Array.isArray(permission) && permission[0] instanceof Perm) permsToRevoke = permission;
-		else if (Array.isArray(permission) && typeof permission[0] == "string")
-			permsToRevoke = permission.map((p) => Perm.deserialise(p));
 		else if (typeof permission == "string") permsToRevoke = [Perm.deserialise(permission)];
 		else if (permission instanceof Perm) permsToRevoke = [permission];
+		else if (Array.isArray(permission) && permission.every((p) => typeof p == "string"))
+			permsToRevoke = permission.map((p) => Perm.deserialise(p));
+		else permsToRevoke = permission;
 
 		for (const permToRevoke of permsToRevoke) {
 			if (!permToRevoke.isPositive) throw new Error("Cannot revoke a negative permission");
@@ -185,7 +160,7 @@ export class PermsList {
 			if (this.exactMatch(permToRevoke)) this._remove(permToRevoke);
 
 			for (const myPerm of this.perms) {
-                // Revoking a broad permission removes all granted child permissions
+				// Revoking a broad permission removes all granted child permissions
 				if (myPerm.isChildOf(permToRevoke)) this._remove(myPerm);
 			}
 
@@ -212,19 +187,16 @@ export class PermsList {
 	static serialise(permsList: PermsList) {
 		return permsList.perms.map((p) => Perm.serialise(p)).join(PERMS_DELIMITER);
 	}
-
-	static deserialise(...permsList: string[]): PermsList;
-	static deserialise(...permsList: Perm[]): PermsList;
-	static deserialise(permsList: string[]): PermsList;
-	static deserialise(permsList: Perm[]): PermsList;
-	static deserialise(permsList: unknown): PermsList {
-		if (Array.isArray(permsList)) {
-			if (permsList[0] instanceof Perm) return new PermsList(permsList);
-			const perms = permsList.map((p) => Perm.deserialise(p));
-			return new PermsList(perms);
-		} else if (typeof permsList == "string") {
+	static deserialise(permsList: string[] | Perm[] | string): PermsList {
+		if (typeof permsList == "string") {
 			const perms = permsList.split(PERMS_DELIMITER).map((p) => Perm.deserialise(p));
 			return new PermsList(perms);
+		} else if (Array.isArray(permsList)) {
+			if (permsList.every((p) => typeof p == "string")) {
+				const perms = permsList.map((p) => Perm.deserialise(p));
+				return new PermsList(perms);
+			}
+			return new PermsList(permsList);
 		}
 		throw Error("Cannot process data type");
 	}
@@ -233,4 +205,3 @@ export class PermsList {
 		return `PermsList{${PermsList.serialise(this)}}`;
 	}
 }
-
