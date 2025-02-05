@@ -20,6 +20,15 @@ export class Perm {
 		this.isPositive = isPositive;
 	}
 
+	[Symbol.iterator]() {
+		let index = -1;
+		let data = this.permPath;
+
+		return {
+			next: () => ({ value: data[++index], done: !(index in data) })
+		};
+	}
+
 	covers(permission: Perm | string): [false, CoverType] | [true] {
 		const permToTest = typeof permission == "string" ? Perm.deserialise(permission) : (permission as Perm);
 		if (!permToTest.isPositive) throw Error("Cannot perform cover check on a revoked permission");
@@ -86,12 +95,21 @@ export class Perm {
 export class PermsList {
 	perms: Perm[];
 
+	[Symbol.iterator]() {
+		let index = -1;
+		let data = this.perms;
+
+		return {
+			next: () => ({ value: data[++index], done: !(index in data) })
+		};
+	}
+
 	constructor(perms?: Perm[]) {
 		this.perms = perms || [];
 	}
 
 	has(perm: Perm | string): boolean {
-		const deserialisedPerm = typeof perm == "string" ? Perm.deserialise(perm) : (perm as Perm);
+		const deserialisedPerm = typeof perm == "string" ? Perm.deserialise(perm) : perm;
 		let wasCoveredAtLeastOnce = false;
 		for (const p of this.perms) {
 			const result = p.covers(deserialisedPerm);
